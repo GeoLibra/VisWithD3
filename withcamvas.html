@@ -1,0 +1,65 @@
+<html>
+<head>
+    <meta charset=utf-8 />
+    <title>drawcanvasmap</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+</head>
+<style>
+    body,
+    html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+
+    body {
+        background-color:#2C2C43;
+    }
+</style>
+
+<body>
+<canvas id="map" ></canvas>
+<!-- Example data. -->
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script>
+    var canvasWidth = window.innerWidth;
+    var canvasHeight = window.innerHeight;
+
+    var projection = d3.geoMercator()
+        .center([121.5, 31.1]) //最终要换成上海的中心坐标
+        .scale(850)
+        .translate([canvasWidth / 2, canvasHeight / 2]) //渲染容器的中心点
+
+
+    d3.json("./data/chinapolygon.geojson").then(
+        function (data) {
+            drawCanvasMap(data, projection)
+        }
+    );
+
+    function drawCanvasMap(mapData, projection) {
+        var canvas = document.getElementById('map')
+        var context = canvas.getContext('2d')
+        context.globalCompositeOperation = 'lighter'
+
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+
+        var path = d3.geoPath()
+            .projection(projection)
+            .context(context)
+
+        // console.log(mapData.features)
+
+        mapData.features.forEach(d => {
+            context.beginPath()
+            path(d)
+            context.strokeStyle = '#4A4A70'
+            context.lineWidth = 1
+            context.stroke()
+        })
+    }
+</script>
+</body>
+</html>
