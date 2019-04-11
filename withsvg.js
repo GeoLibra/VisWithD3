@@ -11,7 +11,8 @@ let projection=d3.geoMercator()
 let svg=d3.select("#map")
     .append("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+
 var path = d3.geoPath()
     .projection(projection);
 
@@ -26,6 +27,10 @@ function getRandomColor( ) {
 }
 
 d3.json("./data/chinapolygon.geojson").then(function(root) {
+    function zoomedsvg() {
+        map.attr("transform", d3.event.transform);
+    }
+
     let map=svg.append("g");
     map.append("path");
     map.selectAll(".mymap")
