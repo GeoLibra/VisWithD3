@@ -40,20 +40,25 @@
         let map=d3.select('#map'),
             width=1000,
             height=900,
-            color=d3.scaleOrdinal(d3.schemeCategory10);
+            color=d3.scaleOrdinal(d3.schemeCategory10),
+            mapdata;
 
         d3.json("./data/chinapolygon.geojson").then(
+
             function (data) {
-                drawMap(data, 'canvas');
+                mapdata=data;
+                drawMap('canvas');
             }
         );
-        function drawMap(data,method){
+        function drawMap(method){
+            map.select('.drawarea').remove();
+
             let drawarea=map
                 .append(method)
                 .classed('drawarea',true)
                 .attr('width', width).attr('height', height);
 
-            let center=d3.geoCentroid(data),
+            let center=d3.geoCentroid(mapdata),
                 scale=850,
                 offset=[width / 2, height / 2];
 
@@ -65,7 +70,7 @@
 
             let path = d3.geoPath().projection(projection);
 
-            let bounds  = path.bounds(data);
+            let bounds  = path.bounds(mapdata);
             let hscale  = scale*width  / (bounds[1][0] - bounds[0][0]);
             let vscale  = scale*height / (bounds[1][1] - bounds[0][1]);
             scale   = (hscale < vscale) ? hscale : vscale;
@@ -77,12 +82,10 @@
                 .scale(scale).translate(offset);
             path = path.projection(projection);
 
-            let mapdata=data.features;
-            console.log(mapdata);
             if(method=='canvas'){
                 let ctx=drawarea.node().getContext('2d');
                 path.context(ctx);
-                mapdata.forEach((d,i) => {
+                mapdata.features.forEach((d,i) => {
                     ctx.beginPath();
                     path(d);
                     let c = color(i);
@@ -92,6 +95,18 @@
                     ctx.lineWidth = 1;
                     ctx.stroke();
                 })
+            }else{
+                drawarea
+                    .selectAll(".province")
+                    .data(mapdata.features)
+                    .enter()
+                    .append("path")
+                    .attr("class", "province")
+                    .attr("d", path)
+                    .style("fill", function (d, i) {
+                        return color(i);
+                    });
+
             }
         }
     }());
