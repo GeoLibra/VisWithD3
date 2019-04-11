@@ -15,7 +15,83 @@
     <script src="https://d3js.org/d3.v5.min.js"></script>
 </head>
 <body>
-<div id="map" class="map"></div>
+<div id="method">
+    <label>
+        <input id='canvas' name="type" type="radio" checked>
+        <span>canvas</span>
+    </label>
+    <label>
+        <input id='svg' name="type" type="radio">
+        <span>svg</span>
+    </label>
+</div>
+<div id="map"></div>
 </body>
 </html>
-<script src="withsvg.js"></script>
+<script>
+    (function () {
+        d3.select("#svg").on('click',function () {
+            drawMap('svg');
+        })
+        d3.select("#canvas").on('click',function () {
+            drawMap('canvas');
+        })
+
+        let map=d3.select('#map'),
+            width=1000,
+            height=900,
+            color=d3.scaleOrdinal(d3.schemeCategory10);
+
+        d3.json("./data/chinapolygon.geojson").then(
+            function (data) {
+                drawMap(data, 'canvas');
+            }
+        );
+        function drawMap(data,method){
+            let drawarea=map
+                .append(method)
+                .classed('drawarea',true)
+                .attr('width', width).attr('height', height);
+
+            let center=d3.geoCentroid(data),
+                scale=850,
+                offset=[width / 2, height / 2];
+
+            let projection = d3.geoMercator()
+                .center(center)
+                .scale(scale)
+                .translate(offset);
+
+
+            let path = d3.geoPath().projection(projection);
+
+            let bounds  = path.bounds(data);
+            let hscale  = scale*width  / (bounds[1][0] - bounds[0][0]);
+            let vscale  = scale*height / (bounds[1][1] - bounds[0][1]);
+            scale   = (hscale < vscale) ? hscale : vscale;
+            offset  = [width - (bounds[0][0] + bounds[1][0])/2,
+                height - (bounds[0][1] + bounds[1][1])/2];
+
+            // new projection
+            projection = d3.geoMercator().center(center)
+                .scale(scale).translate(offset);
+            path = path.projection(projection);
+
+            let mapdata=data.features;
+            console.log(mapdata);
+            if(method=='canvas'){
+                let ctx=drawarea.node().getContext('2d');
+                path.context(ctx);
+                mapdata.forEach((d) => {
+                    ctx.beginPath();
+                    path(d);
+                    ctx.fillStyle='#22dd3c';
+                    ctx.fill();
+                    ctx.strokeStyle = '#4A4A70';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                })
+            }
+        }
+    }());
+</script>

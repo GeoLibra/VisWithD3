@@ -27,37 +27,33 @@
     var canvasHeight = window.innerHeight;
 
     var projection = d3.geoMercator()
-        .center([121.5, 31.1]) //最终要换成上海的中心坐标
+        .center([114.371705,30.5416])
         .scale(850)
-        .translate([canvasWidth / 2, canvasHeight / 2]) //渲染容器的中心点
+        .translate([canvasWidth / 2, canvasHeight / 2]);
 
 
     d3.json("./data/chinapolygon.geojson").then(
         function (data) {
-            drawCanvasMap(data, projection)
+            drawCanvasMap(data, projection);
         }
     );
 
     function drawCanvasMap(mapData, projection) {
-        var canvas = document.getElementById('map')
-        var context = canvas.getContext('2d')
-        context.globalCompositeOperation = 'lighter'
+        var canvas = document.getElementById('map');
+        var context = canvas.getContext('2d');
+        context.globalCompositeOperation = 'lighter';
 
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
         var path = d3.geoPath()
             .projection(projection)
-            .context(context)
-
-        // console.log(mapData.features)
-
+            .context(context);
         mapData.features.forEach(d => {
-            context.beginPath()
-            path(d)
-            context.strokeStyle = '#4A4A70'
-            context.lineWidth = 1
-            context.stroke()
+            context.beginPath();
+            path(d);
+            context.strokeStyle = '#4A4A70';
+            context.lineWidth = 1;
+            context.stroke();
         })
     }
 </script>
