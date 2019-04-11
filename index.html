@@ -82,10 +82,11 @@
             if(method=='canvas'){
                 let ctx=drawarea.node().getContext('2d');
                 path.context(ctx);
-                mapdata.forEach((d) => {
+                mapdata.forEach((d,i) => {
                     ctx.beginPath();
                     path(d);
-                    ctx.fillStyle='#22dd3c';
+                    let c = color(i);
+                    ctx.fillStyle=c;
                     ctx.fill();
                     ctx.strokeStyle = '#4A4A70';
                     ctx.lineWidth = 1;
