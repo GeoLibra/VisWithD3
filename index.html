@@ -38,8 +38,8 @@
         })
 
         let map=d3.select('#map'),
-            width=1000,
-            height=900,
+            width=window.innerWidth,
+            height=window.innerHeight,
             color=d3.scaleOrdinal(d3.schemeCategory10),
             mapdata;
 
@@ -115,9 +115,9 @@
                 }
             }else{
                 function zoomedsvg() {
-                    drawarea.attr("transform", d3.event.zoomTransform);
+                    drawarea
+                        .selectAll(".province").attr("transform", d3.event.transform);
                 }
-
                 drawarea
                     .selectAll(".province")
                     .data(mapdata.features)
@@ -128,7 +128,7 @@
                     .style("fill", function (d, i) {
                         return color(i);
                     });
-                map
+                drawarea
                     .call(d3.zoom()
                     .scaleExtent([1 / 2, 4])
                     .on("zoom", zoomedsvg));
